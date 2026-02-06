@@ -32,7 +32,6 @@ public class ValidMovesTests {
                     """));
 
         // Knight moves
-        System.out.println(game.getBoard());
         ChessPosition knightPosition = new ChessPosition(4, 3);
         var validMoves = TestUtilities.loadMoves(knightPosition, new int[][]{{3, 5}, {6, 2}});
         assertMoves(game, validMoves, knightPosition);

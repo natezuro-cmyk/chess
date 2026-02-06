@@ -145,7 +145,6 @@ public class GameStatusTests {
                 """));
         game.setTeamTurn(ChessGame.TeamColor.BLACK);
 
-        System.out.println(game.getBoard());
         Assertions.assertFalse(game.isInCheckmate(ChessGame.TeamColor.BLACK), INCORRECT_BLACK_CHECKMATE);
         Assertions.assertFalse(game.isInCheckmate(ChessGame.TeamColor.WHITE), INCORRECT_WHITE_CHECKMATE);
     }
