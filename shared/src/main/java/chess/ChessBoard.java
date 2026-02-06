@@ -101,7 +101,11 @@ public class ChessBoard {
     }
 
     public boolean hasPiece(ChessPosition pos){
-        return board[pos.getRow()-1][pos.getColumn()-1] != null;
+
+        if(!isOOB(pos)){
+            return board[pos.getRow()-1][pos.getColumn()-1] != null;
+        }
+        return false;
     }
 
     @Override

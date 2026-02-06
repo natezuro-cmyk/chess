@@ -59,6 +59,7 @@ public class GameStatusTests {
                 | | | | | | | | |
                 """));
 
+        System.out.println(game.getBoard());
         Assertions.assertTrue(game.isInCheck(ChessGame.TeamColor.WHITE), MISSING_WHITE_CHECK);
         Assertions.assertFalse(game.isInCheck(ChessGame.TeamColor.BLACK), INCORRECT_BLACK_CHECK);
     }
@@ -144,6 +145,7 @@ public class GameStatusTests {
                 """));
         game.setTeamTurn(ChessGame.TeamColor.BLACK);
 
+        System.out.println(game.getBoard());
         Assertions.assertFalse(game.isInCheckmate(ChessGame.TeamColor.BLACK), INCORRECT_BLACK_CHECKMATE);
         Assertions.assertFalse(game.isInCheckmate(ChessGame.TeamColor.WHITE), INCORRECT_WHITE_CHECKMATE);
     }
