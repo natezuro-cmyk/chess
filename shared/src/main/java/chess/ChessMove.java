@@ -1,5 +1,10 @@
 package chess;
 
+import chess.ChessPiece;
+import chess.ChessPosition;
+
+import static java.util.Objects.hash;
+
 /**
  * Represents moving a chess piece on a chessboard
  * <p>
@@ -8,22 +13,30 @@ package chess;
  */
 public class ChessMove {
 
+    ChessPosition startPosition;
+    ChessPosition endPosition;
+    ChessPiece.PieceType promotionPiece;
+
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
+        this.startPosition = startPosition;
+        this.endPosition = endPosition;
+        this.promotionPiece = promotionPiece;
     }
 
+    public void setStartPosition(ChessPosition startPosition) {this.startPosition = startPosition;}
     /**
      * @return ChessPosition of starting location
      */
     public ChessPosition getStartPosition() {
-        throw new RuntimeException("Not implemented");
+        return this.startPosition;
     }
 
     /**
      * @return ChessPosition of ending location
      */
     public ChessPosition getEndPosition() {
-        throw new RuntimeException("Not implemented");
+        return this.endPosition;
     }
 
     /**
@@ -33,6 +46,24 @@ public class ChessMove {
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {
-        throw new RuntimeException("Not implemented");
+        return this.promotionPiece;
+    }
+
+    @Override
+    public String toString(){
+        return("[" + startPosition.getRow() + "," + startPosition.getColumn() + "]"
+                + "[" + endPosition.getRow() + "," + endPosition.getColumn() + "]");
+    }
+
+    @Override
+    public boolean equals(Object other){
+        ChessMove newMove = (ChessMove) other;
+        return this.startPosition.equals(newMove.getStartPosition())
+                && this.endPosition.equals(newMove.getEndPosition()) &&this.getPromotionPiece() == newMove.getPromotionPiece();
+    }
+
+    @Override
+    public int hashCode(){
+        return hash(startPosition,endPosition,promotionPiece);
     }
 }
