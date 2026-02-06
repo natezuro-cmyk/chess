@@ -104,8 +104,26 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck (TeamColor teamColor){
-        throw new UnsupportedOperationException("Not yet implemented");
+        ChessPosition kingPos = getKing(teamColor);
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition startPos = new ChessPosition(row, col);
+                if(board.getPiece(startPos) != null){
+                    ChessPiece piece = board.getPiece(startPos);
+                    Collection<ChessMove> moves = piece.pieceMoves(board, startPos);
+                    if (moves != null) {
+                        for (ChessMove move : moves) {
+                            if (move.getEndPosition().equals(kingPos)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
+
 
 
     /**
