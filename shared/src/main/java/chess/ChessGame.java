@@ -133,8 +133,25 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate (TeamColor teamColor){
-        throw new UnsupportedOperationException("Not yet implemented");
+        Collection<ChessMove> validMoves = new ArrayList<>();
+
+
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition startPos = new ChessPosition(row, col);
+
+
+                if(board.hasPiece(startPos)){
+                    ChessPiece piece = board.getPiece(startPos);
+                    if (piece.getTeamColor() == teamColor) {
+                        validMoves.addAll(validMoves(startPos));
+                    }
+                }
+            }
+        }
+        return(isInCheck(teamColor) && validMoves.isEmpty());
     }
+
 
     /**
      * Determines if the given team is in stalemate, which here is defined as having
