@@ -17,10 +17,10 @@ public class RegisterService {
 
     public AuthData registerUser(UserData user) throws DataAccessException {
        if (user.username() == null || user.email() == null || user.password() == null){
-           throw new BadRequestException("The data you entered appeared as null");
+           throw new BadRequestException("bad request");
        }
        if (data.getUser(user.username()) != null){
-           throw new AlreadyTakenException("That username is already taken");
+           throw new AlreadyTakenException("already taken");
        }
        else{
            data.createUser(user);
