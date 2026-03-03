@@ -169,6 +169,11 @@ public class Server {
                 String authToken = ctx.header("authorization");
                 AuthData authData = new AuthData(authToken, null);
                 var jsonBody = ctx.bodyAsClass(Map.class);
+                if(jsonBody.get("gameID") == null){
+                    ctx.status(400);
+                    ctx.json(Map.of("message", "Error: bad request"));
+                    return;
+                }
                 int gameID = ((Double) jsonBody.get("gameID")).intValue();
                 String color = (String)jsonBody.get("playerColor");
                 joinGameService.joinGame(authData, gameID, color);
