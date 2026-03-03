@@ -23,7 +23,7 @@ public class ServiceTests {
     }
 
     @Test
-    public void OKlogin() throws Exception {
+    public void okLogin() throws Exception {
         LoginService loginService = new LoginService(dataAccess);
         UserData user = new UserData("billy", "1234", "billy@gmail.com");
         dataAccess.createUser(user);
@@ -46,7 +46,7 @@ public class ServiceTests {
     }
 
     @Test
-    public void OKlogout() throws Exception {
+    public void okLogout() throws Exception {
         RegisterService registerService = new RegisterService(dataAccess);
         LoginService loginService = new LoginService(dataAccess);
         LogoutService logoutService = new LogoutService(dataAccess);
@@ -101,7 +101,7 @@ public class ServiceTests {
     }
 
     @Test
-    public void OKcreateGame() throws Exception {
+    public void okCreateGame() throws Exception {
         ListGamesService listGamesService = new ListGamesService(dataAccess);
         AuthData data = new AuthData("1234","billy");
         dataAccess.createAuth(new AuthData("1234", "billy"));
@@ -121,7 +121,7 @@ public class ServiceTests {
     }
 
     @Test
-    public void OkJoin() throws Exception {
+    public void okJoin() throws Exception {
         dataAccess.createAuth(new AuthData("token123", "billy"));
         JoinGameService joinGameService = new JoinGameService(dataAccess);
         int gameID = dataAccess.createGame("mygame");
@@ -141,7 +141,7 @@ public class ServiceTests {
     }
 
     @Test
-    public void OkRegister() throws Exception {
+    public void okRegister() throws Exception {
         UserData user = new UserData("billy", "1234", "billy@gmail.com");
         RegisterService registerService = new RegisterService(dataAccess);
         AuthData result = registerService.registerUser(user);
