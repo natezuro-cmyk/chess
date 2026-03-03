@@ -180,15 +180,17 @@ public class ChessGame {
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition startPos = new ChessPosition(row, col);
-                if(board.getPiece(startPos) != null){
-                    ChessPiece piece = board.getPiece(startPos);
-                    Collection<ChessMove> moves = piece.pieceMoves(board, startPos);
-                    if (moves != null) {
-                        for (ChessMove move : moves) {
-                            if (move.getEndPosition().equals(kingPos)) {
-                                return true;
-                            }
-                        }
+                if(board.getPiece(startPos) == null) {
+                    continue;
+                }
+                ChessPiece piece = board.getPiece(startPos);
+                Collection<ChessMove> moves = piece.pieceMoves(board, startPos);
+                if (moves == null) {
+                    continue;
+                }
+                for (ChessMove move : moves) {
+                    if (move.getEndPosition().equals(kingPos)) {
+                        return true;
                     }
                 }
             }
