@@ -31,6 +31,9 @@ public class JoinGameService {
         }
         if(color.equals("WHITE"))
             game = new GameData(game.gameID(), data.getAuth(authData.authToken()).username(), game.blackUsername(), game.gameName(), game.game());
+        if(!color.equals("WHITE") && !color.equals("BLACK")){
+            throw new BadRequestException("bad request");
+        }
 
         data.updateGame(game);
 
