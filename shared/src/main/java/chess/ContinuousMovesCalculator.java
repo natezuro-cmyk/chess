@@ -3,18 +3,25 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class SidewaysMovesCalculator {
+public class ContinuousMovesCalculator {
     Collection<ChessMove> moves = new ArrayList<>();
     ChessBoard board;
     ChessPosition pos;
 
-    public SidewaysMovesCalculator(ChessBoard board, ChessPosition pos) {
+    public ContinuousMovesCalculator(ChessBoard board, ChessPosition pos) {
         this.board = board;
         this.pos = pos;
     }
 
-    public Collection<ChessMove> getMoves () {
-        int[][] directions = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+    public Collection<ChessMove> getMoves (String type) {
+        int[][] directions = {{0,1},{0,-1},{1,0},{-1,0},{1, 1},{1, -1},{-1, 1},{-1, -1}};
+
+        if(type.equals("ROOK")){
+            directions = new int[][]{{0,1},{0,-1},{1,0},{-1,0}};
+        }
+        if(type.equals("BISHOP")){
+            directions = new int[][]{{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+        }
 
         for (int[] dir : directions) {
             ChessPosition nextPos = new ChessPosition(this.pos.getRow() + dir[0], this.pos.getColumn() + dir[1]);

@@ -14,11 +14,9 @@ public class QueenMovesCalculator {
     }
 
     public Collection<ChessMove> getMoves() {
-        SidewaysMovesCalculator sideMoves = new SidewaysMovesCalculator(board,pos);
-        StraightMovesCalculator straightMoves = new StraightMovesCalculator(board,pos);
-        moves.addAll(sideMoves.getMoves());
-        moves.addAll(straightMoves.getMoves());
-        return moves;
+        ContinuousMovesCalculator queenMoves = new ContinuousMovesCalculator(board,pos);
+
+        return queenMoves.getMoves("QUEEN");
     }
 
 

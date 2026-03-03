@@ -14,8 +14,8 @@ public class BishopMovesCalculator {
     }
 
     public Collection<ChessMove> getMoves(){
-        SidewaysMovesCalculator moves = new SidewaysMovesCalculator(board,pos);
-        return moves.getMoves();
+        ContinuousMovesCalculator bishopMoves = new ContinuousMovesCalculator(board,pos);
+        return bishopMoves.getMoves("BISHOP");
     }
 
 

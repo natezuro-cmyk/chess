@@ -14,8 +14,8 @@ public class RookMovesCalculator {
     }
 
     public Collection<ChessMove> getMoves(){
-        StraightMovesCalculator rookMoves = new StraightMovesCalculator(board,pos);
-        return rookMoves.getMoves();
+        ContinuousMovesCalculator rookMoves = new ContinuousMovesCalculator(board,pos);
+        return rookMoves.getMoves("ROOK");
 
     }
 
