@@ -27,7 +27,7 @@ public class QueenMovesCalculator {
                     moves.add(new ChessMove(this.pos, nextPos, null));
                     break;
                 }
-                else break;
+                else {break;}
             }
         }
         int[][] directionsTwo = {{1,1},{1,-1},{-1,1},{-1,-1}};
@@ -43,7 +43,7 @@ public class QueenMovesCalculator {
                     moves.add(new ChessMove(this.pos, nextPos, null));
                     break;
                 }
-                else break;
+                else {break;}
             }
         }
         return moves;

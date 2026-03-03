@@ -49,7 +49,9 @@ public class PawnMovesCalculator {
             moves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(), ChessPiece.PieceType.ROOK));
             moves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(), ChessPiece.PieceType.KNIGHT));
         }
-        else moves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(), null));
+        else {
+            moves.add(new ChessMove(move.getStartPosition(),move.getEndPosition(), null));
+        }
     }
 
 }

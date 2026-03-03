@@ -76,8 +76,9 @@ public class ChessGame {
             copiedBoard.removePiece(move.getStartPosition());
             copiedBoard.addPiece(move.getEndPosition(), piece);
 
-
-            if (copiedGame.isInCheck(color)) removeMoves.add(move);
+            if (copiedGame.isInCheck(color)){
+                removeMoves.add(move);
+            }
         }
         moves.removeAll(removeMoves);
         return moves;
@@ -111,7 +112,9 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
 
 
-        if(board.getPiece(move.getStartPosition()) == null) throw new InvalidMoveException("Invalid move");
+        if(board.getPiece(move.getStartPosition()) == null) {
+            throw new InvalidMoveException("Invalid move");
+        }
 
 
         ChessPiece piece = board.getPiece(move.getStartPosition());

@@ -47,8 +47,8 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        if(board[position.getRow()-1][position.getColumn()-1] == null) return null;
-        else return board[position.getRow()-1][position.getColumn()-1];
+        if(board[position.getRow()-1][position.getColumn()-1] == null) {return null;}
+        else {return board[position.getRow()-1][position.getColumn()-1];}
     }
 
     /**
@@ -144,7 +144,9 @@ public class ChessBoard {
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition pos = new ChessPosition(row, col);
-                if (getPiece(pos) != null) pieces.append(pos).append(" has ").append(getPiece(pos)).append(" ");
+                if (getPiece(pos) != null) {
+                    pieces.append(pos).append(" has ").append(getPiece(pos)).append(" ");
+                }
             }
         }
         return pieces.toString();

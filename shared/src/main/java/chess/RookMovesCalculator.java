@@ -27,7 +27,7 @@ public class RookMovesCalculator {
                     moves.add(new ChessMove(this.pos, nextPos, null));
                     break;
                 }
-                else break;
+                else {break;}
             }
         }
         return moves;
