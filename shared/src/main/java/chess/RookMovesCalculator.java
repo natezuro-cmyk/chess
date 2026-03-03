@@ -14,23 +14,9 @@ public class RookMovesCalculator {
     }
 
     public Collection<ChessMove> getMoves(){
-        int[][] directions = {{0,1},{0,-1},{1,0},{-1,0}};
+        StraightMovesCalculator rookMoves = new StraightMovesCalculator(board,pos);
+        return rookMoves.getMoves();
 
-        for (int[] dir: directions){
-            ChessPosition nextPos = new ChessPosition(this.pos.getRow()+dir[0], this.pos.getColumn()+dir[1]);
-            while(!board.isOOB(nextPos)){
-                if(!board.hasPiece(nextPos)){
-                    moves.add(new ChessMove(this.pos, nextPos, null));
-                    nextPos = new ChessPosition(nextPos.getRow()+dir[0], nextPos.getColumn()+dir[1]);
-                }
-                else if(board.hasPiece(nextPos) && board.getPiece(nextPos).getTeamColor() != board.getPiece(pos).getTeamColor()){
-                    moves.add(new ChessMove(this.pos, nextPos, null));
-                    break;
-                }
-                else {break;}
-            }
-        }
-        return moves;
     }
 
 }
