@@ -83,13 +83,53 @@ public class ServiceTests {
     public void okListGames() throws Exception {
         DataAccess dataAccess = new MemoryDataAccess();
         ListGamesService listGamesService = new ListGamesService(dataAccess);
+        RegisterService registerService = new RegisterService(dataAccess);
+        UserData user = new UserData("billy", "1234", "billy@gmail.com");
+        AuthData data = registerService.registerUser(user);
         dataAccess.createGame("1");
         dataAccess.createGame("2");
         dataAccess.createGame("3");
 
-        list
+        int size = listGamesService.listGames(data).size();
 
-        assertThrows(UnauthorizedException.class, () -> logoutService.logout(data));
+        assertTrue(size == 3);
+    }
+
+
+    @Test
+    public void badListGames() throws Exception {
+        DataAccess dataAccess = new MemoryDataAccess();
+        ListGamesService listGamesService = new ListGamesService(dataAccess);
+        AuthData data = new AuthData("1234","billy");
+        dataAccess.createGame("1");
+        dataAccess.createGame("2");
+        dataAccess.createGame("3");
+
+        assertThrows(UnauthorizedException.class, () -> listGamesService.listGames(data));
+    }
+
+    @Test
+    public void OKcreateGames() throws Exception {
+        DataAccess dataAccess = new MemoryDataAccess();
+        ListGamesService listGamesService = new ListGamesService(dataAccess);
+        AuthData data = new AuthData("1234","billy");
+        dataAccess.createGame("1");
+        dataAccess.createGame("2");
+        dataAccess.createGame("3");
+
+        assertThrows(UnauthorizedException.class, () -> listGamesService.listGames(data));
+    }
+
+    @Test
+    public void badCreateGames() throws Exception {
+        DataAccess dataAccess = new MemoryDataAccess();
+        ListGamesService listGamesService = new ListGamesService(dataAccess);
+        AuthData data = new AuthData("1234","billy");
+        dataAccess.createGame("1");
+        dataAccess.createGame("2");
+        dataAccess.createGame("3");
+
+        assertThrows(UnauthorizedException.class, () -> listGamesService.listGames(data));
     }
 
 
