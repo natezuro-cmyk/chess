@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.*;
@@ -14,6 +15,8 @@ import static java.sql.Types.NULL;
 
 
 public class MySqlDataAccess implements DataAccess {
+
+    private int gameID = 0;
 
     public void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
@@ -84,6 +87,24 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public int createGame(String gameName) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()){
+            String statement = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
+            ChessGame game = new ChessGame();
+            String gameJson = new Gson().toJson(game);
+            try(var preparedStatement = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)){
+                preparedStatement.setNull(1, Types.NULL);
+                preparedStatement.setNull(2, Types.NULL);
+                preparedStatement.setString(3, gameName);
+                preparedStatement.setString(4, gameJson);
+                preparedStatement.executeUpdate();
+                ResultSet key = preparedStatement.getGeneratedKeys();
+                if (key.next()) {
+                    return key.getInt(1);
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("failed to create user database", ex);
+        }
         return 0;
     }
 
