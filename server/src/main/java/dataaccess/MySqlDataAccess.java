@@ -37,17 +37,16 @@ public class MySqlDataAccess implements DataAccess {
 
         @Override
     public void clear() throws DataAccessException {
-
-        var statement = "TRUNCATE TABLE user";
-
-        try (var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
-             var preparedStatement = conn.prepareStatement(statement)) {
-            preparedStatement.executeUpdate();
+        try (var conn = DatabaseManager.getConnection()){
+            String[] statements = new String[]{"DROP TABLE IF EXISTS games", "DROP TABLE IF EXISTS users", "DROP TABLE IF EXISTS authTokens"};
+            for(String statement: statements) {
+                try(var preparedStatement = conn.prepareStatement(statement)){
+                    preparedStatement.executeUpdate();
+                }
+            }
         } catch (SQLException ex) {
-            throw new DataAccessException("failed to create database", ex);
+            throw new DataAccessException("failed to clear database", ex);
         }
-        DROP DATABASE pet_store;
-        CREATE DATABASE pet_store;
     }
 
     @Override
