@@ -110,12 +110,44 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()){
+            String statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games WHERE gameID = ?";
+            try(var preparedStatement = conn.prepareStatement(statement)){
+                preparedStatement.setInt(1, gameID);
+                ResultSet data = preparedStatement.executeQuery();
+                if(data.next()){
+                    String json = data.getString("game");
+                    ChessGame game = new Gson().fromJson(json, ChessGame.class);
+                    return new GameData(data.getInt("gameID"), data.getString("whiteUsername"),
+                            data.getString("blackUsername"), data.getString("gameName"),
+                            game);
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("failed to get user from database", ex);
+        }
         return null;
     }
 
     @Override
     public List<GameData> listGames() throws DataAccessException {
-        return List.of();
+        try (var conn = DatabaseManager.getConnection()){
+            String statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games WHERE gameID < 0";
+            try(var preparedStatement = conn.prepareStatement(statement)){
+                preparedStatement.setInt(1, gameID);
+                ResultSet data = preparedStatement.executeQuery();
+                if(data.next()){
+                    String json = data.getString("game");
+                    ChessGame game = new Gson().fromJson(json, ChessGame.class);
+                    return new GameData(data.getInt("gameID"), data.getString("whiteUsername"),
+                            data.getString("blackUsername"), data.getString("gameName"),
+                            game);
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("failed to get user from database", ex);
+        }
+        return null;
     }
 
     @Override
