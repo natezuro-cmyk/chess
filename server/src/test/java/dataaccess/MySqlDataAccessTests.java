@@ -1,27 +1,32 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.*;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MySqlDataAccessTests {
-    DataAccess dataAccess = new MySqlDataAccess();
+   MySqlDataAccess dataAccess;
 
     @BeforeEach
-    void clear() throws DataAccessException {
-        dataAcces.clear();
+    void setUp() throws DataAccessException {
+        dataAccess = new MySqlDataAccess();
+        dataAccess.clear();
     }
 
     @Test
     public void okClear() throws Exception {
-        ClearService clearService = new ClearService(dataAccess);
         dataAccess.createUser(new UserData("billy", "1234", "billy@gmail.com"));
         dataAccess.createGame("mygame");
 
-        dataAcces.clear();
+        dataAccess.clear();
 
         assertNull(dataAccess.getUser("billy"));
         assertNull(dataAccess.getGame(1));
@@ -79,59 +84,80 @@ public class MySqlDataAccessTests {
 
     @Test
     public void okCreateGame() throws Exception {
-        ListGamesService listGamesService = new ListGamesService(dataAccess);
-        AuthData data = new AuthData("1234","billy");
-        dataAccess.createAuth(new AuthData("1234", "billy"));
-        dataAccess.createGame("1");
-
-        int size = listGamesService.listGames(data).size();
-
-        assertTrue(size == 1);
-        assertTrue(data.username().equals("billy"));
+        int id = dataAccess.createGame("mygame");
+        assertTrue(id > 0);
     }
 
     @Test
     public void badCreateGame() throws Exception {
-        CreateGameService createGameService = new CreateGameService(dataAccess);
-        assertThrows(UnauthorizedException.class, () ->
-                createGameService.createGame(new AuthData("1234", "billy"), "firstgame"));
+        assertThrows(DataAccessException.class, () -> dataAccess.createGame(null));
     }
 
     @Test
-    public void okJoin() throws Exception {
-        dataAccess.createAuth(new AuthData("token123", "billy"));
-        JoinGameService joinGameService = new JoinGameService(dataAccess);
-        int gameID = dataAccess.createGame("mygame");
-        assertDoesNotThrow(() ->
-                joinGameService.joinGame(new AuthData("token123", "billy"), gameID, "WHITE"));
+    public void okGetGame() throws Exception {
+        int id = dataAccess.createGame("mygame");
+        GameData game = dataAccess.getGame(id);
+        assertEquals("mygame", game.gameName());
     }
 
     @Test
-    public void badJoin() throws Exception {
-        JoinGameService joinGameService = new JoinGameService(dataAccess);
-        dataAccess.createAuth(new AuthData("1234", "billy"));
-        dataAccess.createAuth(new AuthData("567", "johnny"));
-        int gameID = dataAccess.createGame("firstGame");
-        joinGameService.joinGame(new AuthData("1234", "billy"), gameID, "WHITE");
-        assertThrows(AlreadyTakenException.class, () ->
-                joinGameService.joinGame(new AuthData("567", "johnny"), gameID, "WHITE"));
+    public void badGetGame() throws Exception {
+        GameData game = dataAccess.getGame(-1);
+        assertNull(game);
     }
 
     @Test
-    public void okRegister() throws Exception {
-        UserData user = new UserData("billy", "1234", "billy@gmail.com");
-        RegisterService registerService = new RegisterService(dataAccess);
-        AuthData result = registerService.registerUser(user);
-        assertEquals("billy", result.username());
-        assertNotNull(result.authToken());
+    public void okUpdateGame() throws Exception {
+        int id = dataAccess.createGame("mygame");
+        GameData game = dataAccess.getGame(id);
+        GameData updated = new GameData(id, "billy", null, "mygame", game.game());
+        dataAccess.updateGame(updated);
+        assertEquals("billy", dataAccess.getGame(id).whiteUsername());
     }
 
     @Test
-    public void badRegister() throws Exception {
-        UserData user = new UserData("billy", "1234", "billy@gmail.com");
-        RegisterService registerService = new RegisterService(dataAccess);
-        registerService.registerUser(user);
-        assertThrows(AlreadyTakenException.class, () -> registerService.registerUser(user));
+    public void badUpdateGame() throws Exception {
+        GameData game = new GameData(-1, null, null, "mygame", new ChessGame());
+        assertThrows(DataAccessException.class, () -> dataAccess.updateGame(game));
+    }
+
+    @Test
+    public void okCreateAuth() throws Exception {
+        AuthData auth = new AuthData("token123", "billy");
+        dataAccess.createAuth(auth);
+        assertEquals(auth, dataAccess.getAuth("token123"));
+    }
+
+    @Test
+    public void badCreateAuth() throws Exception {
+        assertThrows(DataAccessException.class, () -> dataAccess.createAuth(null));
+    }
+
+    @Test
+    public void okGetAuth() throws Exception {
+        AuthData auth = new AuthData("token123", "billy");
+        dataAccess.createAuth(auth);
+        AuthData data = dataAccess.getAuth("token123");
+        assertEquals(auth, data);
+    }
+
+    @Test
+    public void badGetAuth() throws Exception {
+        AuthData data = dataAccess.getAuth("faketoken");
+        assertNull(data);
+    }
+
+    @Test
+    public void okDeleteAuth() throws Exception {
+        AuthData auth = new AuthData("token123", "billy");
+        dataAccess.createAuth(auth);
+        dataAccess.deleteAuth("token123");
+        assertNull(dataAccess.getAuth("token123"));
+    }
+
+    @Test
+    public void badDeleteAuth() throws Exception {
+        assertThrows(DataAccessException.class, () -> dataAccess.deleteAuth(null));
     }
 
 

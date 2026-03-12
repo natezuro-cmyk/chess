@@ -13,7 +13,7 @@ import java.util.Map;
 public class Server {
 
     private final Javalin javalin;
-    private DataAccess dataAccess = new DataAccess();
+    private DataAccess dataAccess = new MemoryDataAccess();
     private ClearService clearService = new ClearService(dataAccess);
     private RegisterService registerService = new RegisterService(dataAccess);
     private LoginService loginService = new LoginService(dataAccess);

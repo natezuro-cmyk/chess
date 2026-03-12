@@ -2,27 +2,20 @@ package dataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import exception.ResponseException;
 import model.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import exception.ResponseException;
-
-import static dataaccess.DatabaseManager.*;
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static java.sql.Types.NULL;
 
 
 public class MySqlDataAccess implements DataAccess {
 
-    private int gameID = 0;
-
     public void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()){
-            String[] statements = new String[]{"CREATE TABLE IF NOT EXISTS games(id INT NOT NULL AUTO_INCREMENT, whiteUsername VARCHAR(255) NOT NULL, blackUsername VARCHAR(255) NOT NULL, gameName VARCHAR(255) NOT NULL, chessGame TEXT NOT NULL);",
+            String[] statements = new String[]{"CREATE TABLE IF NOT EXISTS games(gameID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, whiteUsername VARCHAR(255), blackUsername VARCHAR(255), gameName VARCHAR(255) NOT NULL, game TEXT NOT NULL);",
                     "CREATE TABLE IF NOT EXISTS users (username VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL);",
                     "CREATE TABLE IF NOT EXISTS authTokens (authToken VARCHAR(255) NOT NULL, username VARCHAR(255) NOT NULL);"};
             for(String statement: statements) {
@@ -51,6 +44,7 @@ public class MySqlDataAccess implements DataAccess {
         } catch (SQLException ex) {
             throw new DataAccessException("failed to clear database", ex);
         }
+            configureDatabase();
     }
 
     @Override
@@ -58,8 +52,9 @@ public class MySqlDataAccess implements DataAccess {
         try (var conn = DatabaseManager.getConnection()){
             String statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
             try(var preparedStatement = conn.prepareStatement(statement)){
+                String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
                 preparedStatement.setString(1, user.username());
-                preparedStatement.setString(2, user.password());
+                preparedStatement.setString(2, hashedPassword);
                 preparedStatement.setString(3, user.email());
                 preparedStatement.executeUpdate();
             }
