@@ -64,7 +64,7 @@ public class MySqlDataAccess implements DataAccess {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("failed to create user database", ex);
+            throw new DataAccessException("failed to create user", ex);
         }
     }
 
@@ -104,7 +104,7 @@ public class MySqlDataAccess implements DataAccess {
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("failed to create user database", ex);
+            throw new DataAccessException("failed to create game", ex);
         }
         return 0;
     }
@@ -125,7 +125,7 @@ public class MySqlDataAccess implements DataAccess {
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("failed to get user from database", ex);
+            throw new DataAccessException("failed to get game", ex);
         }
         return null;
     }
@@ -146,7 +146,7 @@ public class MySqlDataAccess implements DataAccess {
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("failed to get user from database", ex);
+            throw new DataAccessException("failed to list games", ex);
         }
         return games;
     }
@@ -195,7 +195,7 @@ public class MySqlDataAccess implements DataAccess {
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("failed to get user from database", ex);
+            throw new DataAccessException("failed to get auth from database", ex);
         }
         return null;
     }
@@ -209,7 +209,7 @@ public class MySqlDataAccess implements DataAccess {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("failed to get user from database", ex);
+            throw new DataAccessException("failed to delete auth", ex);
         }
     }
 }
