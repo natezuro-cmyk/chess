@@ -6,6 +6,7 @@ import exception.ResponseException;
 import model.*;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import exception.ResponseException;
 
@@ -131,23 +132,23 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public List<GameData> listGames() throws DataAccessException {
+        List<GameData> games = new ArrayList<>();
         try (var conn = DatabaseManager.getConnection()){
-            String statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games WHERE gameID < 0";
-            try(var preparedStatement = conn.prepareStatement(statement)){
-                preparedStatement.setInt(1, gameID);
+            String statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games";
+            try(var preparedStatement = conn.prepareStatement(statement)) {
                 ResultSet data = preparedStatement.executeQuery();
-                if(data.next()){
+                while(data.next()){
                     String json = data.getString("game");
-                    ChessGame game = new Gson().fromJson(json, ChessGame.class);
-                    return new GameData(data.getInt("gameID"), data.getString("whiteUsername"),
+                    GameData gameData = new GameData(data.getInt("gameID"),data.getString("whiteUsername"),
                             data.getString("blackUsername"), data.getString("gameName"),
-                            game);
+                            new Gson().fromJson(json, ChessGame.class));
+                    games.add(gameData);
                 }
             }
         } catch (SQLException ex) {
             throw new DataAccessException("failed to get user from database", ex);
         }
-        return null;
+        return games;
     }
 
     @Override
