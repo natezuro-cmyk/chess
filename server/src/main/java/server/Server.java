@@ -13,16 +13,29 @@ import java.util.Map;
 public class Server {
 
     private final Javalin javalin;
-    private DataAccess dataAccess = new MemoryDataAccess();
-    private ClearService clearService = new ClearService(dataAccess);
-    private RegisterService registerService = new RegisterService(dataAccess);
-    private LoginService loginService = new LoginService(dataAccess);
-    private LogoutService logoutService = new LogoutService(dataAccess);
-    private ListGamesService listGamesService = new ListGamesService(dataAccess);
-    private CreateGameService createGameService = new CreateGameService(dataAccess);
-    private JoinGameService joinGameService = new JoinGameService(dataAccess);
+    private DataAccess dataAccess;
+    private ClearService clearService;
+    private RegisterService registerService;
+    private LoginService loginService;
+    private LogoutService logoutService;
+    private ListGamesService listGamesService;
+    private CreateGameService createGameService;
+    private JoinGameService joinGameService;
 
     public Server() {
+        try {
+            dataAccess = new MySqlDataAccess();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        clearService = new ClearService(dataAccess);
+        registerService = new RegisterService(dataAccess);
+        loginService = new LoginService(dataAccess);
+        logoutService = new LogoutService(dataAccess);
+        listGamesService = new ListGamesService(dataAccess);
+        createGameService = new CreateGameService(dataAccess);
+        joinGameService = new JoinGameService(dataAccess);
+
         javalin = Javalin.create(config -> {
             config.staticFiles.add("web");
             config.jsonMapper(new io.javalin.json.JavalinGson());
@@ -34,7 +47,6 @@ public class Server {
         listGamesHandler();
         createGameHandler();
         joinGameHandler();
-        // Register your endpoints and exception handlers here.
     }
 
     public int run(int desiredPort) {
