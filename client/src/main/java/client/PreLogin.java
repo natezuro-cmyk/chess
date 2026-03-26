@@ -42,7 +42,16 @@ public class PreLogin {
         if (params.length >= 2) {
             AuthData result = facade.login(params[0], params[1]);
             this.authToken = result.authToken();
-            return String.format("You logged in as %s.", params[0]);
+            return String.format("""
+                    You logged in as %s.You're options are:
+                    - help
+                    - logout
+                    - list
+                    - create
+                    - play
+                    - observe
+                    - quit
+                    """, params[0]);
         }
         throw new Exception("Please type a username and password.");
     }
