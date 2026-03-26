@@ -56,5 +56,9 @@ public class PreLogin {
             throw new Exception("Please provide a username, password and email");
     }
 
+    public String getAuthToken(){
+        return authToken;
+    }
+
 }
 
