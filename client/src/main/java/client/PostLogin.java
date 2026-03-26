@@ -1,14 +1,14 @@
 package client;
 
-import model.AuthData;
+import chess.ChessBoard;
+import chess.ChessGame;
 import model.GameData;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class PostLogin {
-    List<GameData> games;
-    private String authToken = null;
+    private List<GameData> games;
     private ServerFacade facade;
 
     public PostLogin(ServerFacade facade){
@@ -49,8 +49,7 @@ public class PostLogin {
 
     private String logout(String authToken) throws Exception{
         facade.logout(authToken);
-        this.authToken = null;
-        return String.format("You are not logged in");
+        return "You have been logged out.";
     }
 
     private String listGames(String authToken) throws Exception {
@@ -58,7 +57,9 @@ public class PostLogin {
         StringBuilder sb = new StringBuilder();
         for(int i = 1; i <= games.size(); i++){
             GameData game = games.get(i-1);
-            sb.append(i).append(".").append(game.gameName());
+            sb.append(i).append(". ").append(game.gameName());
+            sb.append(" | White: ").append(game.whiteUsername() != null ? game.whiteUsername() : "open");
+            sb.append(" | Black: ").append(game.blackUsername() != null ? game.blackUsername() : "open");
             sb.append("\n");
         }
         return sb.toString();
@@ -66,26 +67,34 @@ public class PostLogin {
 
     private String createGame(String[] params, String authToken) throws Exception {
         if (params.length >= 1) {
-            int gameID =  facade.createGame(authToken, params[0]);
+            facade.createGame(authToken, params[0]);
             return "Game created successfully.";
         }
-        throw new Exception("Please provide game name.");
+        throw new Exception("Please provide a game name.");
     }
 
     private String playGame(String[] params, String authToken) throws Exception{
         if (params.length >= 2) {
-            int i = Integer.valueOf(params[0]);
-            facade.joinGame(authToken, i, params[1]);
-            PostJoin.drawBoard(params)
+            int i = Integer.parseInt(params[0]);
+            facade.joinGame(authToken, games.get(i - 1).gameID(), params[1].toUpperCase());
+            ChessBoard board = new ChessBoard();
+            board.resetBoard();
+            ChessGame.TeamColor perspective = ChessGame.TeamColor.valueOf(params[1].toUpperCase());
+            PostJoin.drawBoard(board, perspective);
+            return "Joined game as " + params[1].toUpperCase() + ".";
         }
-        throw new Exception("enter a game number and color.");
+        throw new Exception("Please enter a game number and color");
     }
 
-    private String observeGame(String[] params){
+    private String observeGame(String[] params) throws Exception{
         if (params.length >= 1) {
-            int gameID =  facade.joinGame(authToken, params[0], params[1]);
+            int i = Integer.parseInt(params[0]);
+            ChessBoard board = new ChessBoard();
+            board.resetBoard();
+            PostJoin.drawBoard(board, ChessGame.TeamColor.WHITE);
+            return "Observing game " + params[0];
         }
-        throw new Exception("Please type a username and password.");
+        throw new Exception("Please enter a game number.");
     }
 
 }
