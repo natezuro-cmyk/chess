@@ -60,7 +60,16 @@ public class PreLogin {
         if (params.length >= 3) {
             AuthData result = facade.register(params[0], params[1], params[2]);
             this.authToken = result.authToken();
-            return String.format("You registered as %s.", params[0]);
+            return String.format("""
+                    You registered as %s.You're options are:
+                    - help
+                    - logout
+                    - list
+                    - create
+                    - play
+                    - observe
+                    - quit
+                    """, params[0]);
         }
             throw new Exception("Please provide a username, password and email");
     }
