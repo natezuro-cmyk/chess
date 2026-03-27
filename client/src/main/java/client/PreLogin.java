@@ -14,7 +14,7 @@ public class PreLogin {
 
     public String eval(String input){
         try {
-            String[] tokens = input.toLowerCase().split(" ");
+            String[] tokens = input.toLowerCase().trim().split("\\s+");
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {

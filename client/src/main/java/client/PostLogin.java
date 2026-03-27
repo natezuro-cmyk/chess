@@ -17,7 +17,7 @@ public class PostLogin {
 
     public String eval(String input, String authToken){
         try {
-            String[] tokens = input.toLowerCase().split(" ");
+            String[] tokens = input.toLowerCase().trim().split("\\s+");
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
@@ -75,20 +75,30 @@ public class PostLogin {
 
     private String playGame(String[] params, String authToken) throws Exception{
         if (params.length >= 2) {
-            int i = Integer.parseInt(params[0]);
+            if (games == null) throw new Exception("Please run 'list' before playing a game.");
+            int i;
+            try { i = Integer.parseInt(params[0]); }
+            catch (NumberFormatException e) { throw new Exception("Please enter a valid game number."); }
+            if (i < 1 || i > games.size()) throw new Exception("Game number out of range. Run 'list' to see available games.");
+            ChessGame.TeamColor perspective;
+            try { perspective = ChessGame.TeamColor.valueOf(params[1].toUpperCase()); }
+            catch (IllegalArgumentException e) { throw new Exception("Invalid color. Please enter WHITE or BLACK."); }
             facade.joinGame(authToken, games.get(i - 1).gameID(), params[1].toUpperCase());
             ChessBoard board = new ChessBoard();
             board.resetBoard();
-            ChessGame.TeamColor perspective = ChessGame.TeamColor.valueOf(params[1].toUpperCase());
             PostJoin.drawBoard(board, perspective);
             return "Joined game as " + params[1].toUpperCase() + ".";
         }
-        throw new Exception("Please enter a game number and color");
+        throw new Exception("Please enter a game number and color.");
     }
 
     private String observeGame(String[] params) throws Exception{
         if (params.length >= 1) {
-            int i = Integer.parseInt(params[0]);
+            if (games == null) throw new Exception("Please run 'list' before observing a game.");
+            int i;
+            try { i = Integer.parseInt(params[0]); }
+            catch (NumberFormatException e) { throw new Exception("Please enter a valid game number."); }
+            if (i < 1 || i > games.size()) throw new Exception("Game number not in range. Type 'list' to see available games.");
             ChessBoard board = new ChessBoard();
             board.resetBoard();
             PostJoin.drawBoard(board, ChessGame.TeamColor.WHITE);
