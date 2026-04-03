@@ -1,44 +1,39 @@
 package websocket;
 
+import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
 
-import java.sql.Connection;
 
-public class WebsocketHandler {
+public class WebsocketHandler{
 
-
-    public WebsocketHandler(UserGameCommand command){
-        if(command.getCommandType() == UserGameCommand.CommandType.CONNECT){
-            connectHandler();
+    public void onMessage(WsMessageContext ctx){
+        UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
+        switch(command.getCommandType()){
+            case UserGameCommand.CommandType.CONNECT -> connectHandler();
+            case UserGameCommand.CommandType.MAKE_MOVE -> makeMoveHandler();
+            case UserGameCommand.CommandType.LEAVE -> leaveHanlder();
+            case UserGameCommand.CommandType.RESIGN -> resignHandlder();
         }
-        if(command.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE){
-            makemoveHandler();
-        }
-        if(command.getCommandType() == UserGameCommand.CommandType.LEAVE){
-            leaveHandler();
-        }
-        if(command.getCommandType() == UserGameCommand.CommandType.RESIGN){
-            resignHandler();
-        }
-
-    }
 
 
     public connectHandler(){
-        JoinGameService jgs = new JoinGameService()
-    }
+
+        }
 
     public makemoveHandler(){
-
-    }
+            MakeMoveService makeMoveService = new MakeMoveService()
+        }
 
     public leaveHanlder(){
 
-    }
+        }
 
     public resignHanlder(){
 
+        }
+
+
     }
-
-
 }
+
+
