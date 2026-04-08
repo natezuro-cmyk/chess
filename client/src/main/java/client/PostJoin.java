@@ -5,8 +5,8 @@ import ui.EscapeSequences;
 
 public class PostJoin {
 
-    private static final String LIGHT_SQUARE = EscapeSequences.SET_BG_COLOR_WHITE;
-    private static final String DARK_SQUARE  = EscapeSequences.SET_BG_COLOR_GREEN;
+    private static final String LIGHT_SQUARE = EscapeSequences.SET_BG_COLOR_GREEN;
+    private static final String DARK_SQUARE  = EscapeSequences.SET_BG_COLOR_WHITE;
     private static final String BORDER       = EscapeSequences.SET_BG_COLOR_DARK_GREY;
 
     private static final String[] WHITE_COLS = {"a", "b", "c", "d", "e", "f", "g", "h"};

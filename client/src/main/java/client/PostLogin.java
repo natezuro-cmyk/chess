@@ -10,9 +10,11 @@ import java.util.List;
 public class PostLogin {
     private List<GameData> games;
     private ServerFacade facade;
+    private PreLogin preLogin;
 
     public PostLogin(ServerFacade facade){
         this.facade = facade;
+        preLogin= new PreLogin(facade);
     }
 
     public String eval(String input, String authToken){
@@ -49,6 +51,7 @@ public class PostLogin {
 
     private String logout(String authToken) throws Exception{
         facade.logout(authToken);
+        preLogin.clearAuth();
         return "You have been logged out.";
     }
 

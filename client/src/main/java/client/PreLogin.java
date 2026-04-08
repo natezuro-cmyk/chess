@@ -78,5 +78,9 @@ public class PreLogin {
         return authToken;
     }
 
+    public void clearAuth(){
+        this.authToken = null;
+    }
+
 }
 
