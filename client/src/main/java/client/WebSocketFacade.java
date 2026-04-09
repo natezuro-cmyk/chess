@@ -7,8 +7,7 @@ import exception.ResponseException;
 import jakarta.websocket.*;
 import model.AuthData;
 import model.GameData;
-import websocket.commands.MakeMoveCommand;
-import websocket.commands.UserGameCommand;
+
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -67,7 +66,7 @@ public class WebSocketFacade extends Endpoint {
             PostJoin.drawBoard(gameData.game().getBoard(), ChessGame.TeamColor.WHITE);
         }
 
-        if(userData.username().equals(blackUsername)){
+        else if(userData.username().equals(blackUsername)){
             PostJoin.drawBoard(gameData.game().getBoard(), ChessGame.TeamColor.BLACK);
         }
 
@@ -77,12 +76,12 @@ public class WebSocketFacade extends Endpoint {
 
     }
 
-    public String error(ErrorMessage message) {
-        return message.getMessage();
+    public void error(ErrorMessage message) {
+        System.out.println(message.getMessage());
     }
 
-    public String notification(NotificationMessage message) {
-        return message.getMessage();
+    public void notification(NotificationMessage message) {
+        System.out.println(message.getMessage());
     }
 
 }
