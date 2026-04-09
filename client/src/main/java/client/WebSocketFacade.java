@@ -1,9 +1,11 @@
 package client;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
 
 import jakarta.websocket.*;
+import model.AuthData;
 import model.GameData;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
@@ -21,6 +23,7 @@ public class WebSocketFacade extends Endpoint {
 
     Session session;
     ServerMessage serverMessage;
+    private ServerFacade facade;
 
     public WebSocketFacade(String url) throws ResponseException {
         try {
@@ -36,7 +39,7 @@ public class WebSocketFacade extends Endpoint {
                 public void onMessage(String message) {
                     ServerMessage messageType = new Gson().fromJson(message, ServerMessage.class);
                     switch (messageType.getServerMessageType()) {
-                        case ServerMessage.ServerMessageType.LOAD_GAME -> loadGame(new Gson().fromJson(message, LoadGameMessage.class));
+                        case ServerMessage.ServerMessageType.LOAD_GAME -> loadGame(new Gson().fromJson(message, LoadGameMessage.class), new Gson().fromJson(message, LoadGameMessage.class).getUserData());
                         case ServerMessage.ServerMessageType.ERROR -> error(new Gson().fromJson(message, ErrorMessage.class));
                         case ServerMessage.ServerMessageType.NOTIFICATION -> notification(new Gson().fromJson(message, NotificationMessage.class));
                     }
@@ -52,19 +55,34 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void loadGame(LoadGameMessage message) {
+    public void loadGame(LoadGameMessage message, AuthData data) {
     //needs to know who is calling it, white player, black player or observer
-        //draws either white or black board depending on whos playing
-        GameData gamedata = message.getGame();
+        //draws either white or black board depending on who's playing
+        GameData gameData = message.getGame();
+        String whiteUsername = gameData.whiteUsername();
+        String blackUsername = gameData.blackUsername();
+        AuthData userData = message.getUserData();
+
+        if(userData.username().equals(whiteUsername)) {
+            PostJoin.drawBoard(gameData.game().getBoard(), ChessGame.TeamColor.WHITE);
+        }
+
+        if(userData.username().equals(blackUsername)){
+            PostJoin.drawBoard(gameData.game().getBoard(), ChessGame.TeamColor.BLACK);
+        }
+
+        else{
+            PostJoin.drawBoard(gameData.game().getBoard(), ChessGame.TeamColor.WHITE);
+        }
 
     }
 
-    public void error(ErrorMessage message) {
-
+    public String error(ErrorMessage message) {
+        return message.getMessage();
     }
 
-    public void notification(NotificationMessage message) {
-
+    public String notification(NotificationMessage message) {
+        return message.getMessage();
     }
 
 }
