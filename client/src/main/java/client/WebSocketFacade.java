@@ -1,11 +1,14 @@
 package client;
 
 import com.google.gson.Gson;
-import com.sun.nio.sctp.NotificationHandler;
 import exception.ResponseException;
 
 import jakarta.websocket.*;
+import model.GameData;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -19,11 +22,10 @@ public class WebSocketFacade extends Endpoint {
     Session session;
     ServerMessage serverMessage;
 
-    public WebSocketFacade(String url, ServerMessage serverMessage) throws ResponseException {
+    public WebSocketFacade(String url) throws ResponseException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
-            this.serverMessage = serverMessage;
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
@@ -31,50 +33,38 @@ public class WebSocketFacade extends Endpoint {
             //set message handler
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
-                public void onMessage(String messageString) {
-                    try {
-                        ServerMessage message = new Gson().fromJson(messageString, ServerMessage.class);
-                        switch (message.getServerMessageType()) {
-                            case UserGameCommand.CommandType.LOAD_DATA -> loadGame(message);
-                            case UserGameCommand.CommandType.ERROR -> error(message);
-                            case UserGameCommand.CommandType.NOTIFICATION -> notify(message);
-                        }
+                public void onMessage(String message) {
+                    ServerMessage messageType = new Gson().fromJson(message, ServerMessage.class);
+                    switch (messageType.getServerMessageType()) {
+                        case ServerMessage.ServerMessageType.LOAD_GAME -> loadGame(new Gson().fromJson(message, LoadGameMessage.class));
+                        case ServerMessage.ServerMessageType.ERROR -> error(new Gson().fromJson(message, ErrorMessage.class));
+                        case ServerMessage.ServerMessageType.NOTIFICATION -> notification(new Gson().fromJson(message, NotificationMessage.class));
                     }
+                }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
-            }
         }
+    }
 
     //Endpoint requires this method, but you don't have to do anything
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void loadGame(LoadGameMessage message) throws ResponseException {
-        try {
-            var action = new (Action.Type.ENTER, visitorName);
-            this.session.getBasicRemote().sendText(new Gson().toJson(action));
-        } catch (IOException ex) {
-            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
-        }
+    public void loadGame(LoadGameMessage message) {
+    //needs to know who is calling it, white player, black player or observer
+        //draws either white or black board depending on whos playing
+        GameData gamedata = message.getGame();
+
     }
 
-    public void error(ErrorMessage message) throws ResponseException {
-        try {
-            var action = new Action(Action.Type.EXIT, visitorName);
-            this.session.getBasicRemote().sendText(new Gson().toJson(action));
-        } catch (IOException ex) {
-            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
-        }
+    public void error(ErrorMessage message) {
 
-    public void notify(NotificationMessage message) throws ResponseException {
-        try {
-            var action = new Action(Action.Type.EXIT, visitorName);
-            this.session.getBasicRemote().sendText(new Gson().toJson(action));
-        } catch (IOException ex) {
-            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
-        }
+    }
+
+    public void notification(NotificationMessage message) {
+
     }
 
 }
