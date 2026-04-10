@@ -21,6 +21,10 @@ public class ServerFacade {
         this.port = port;
     }
 
+    private void throwIfError(HttpURLConnection connection) throws Exception {
+        throwIfError(connection);
+    }
+
     public void clear()throws Exception{
         URL url = new URL("http://localhost:"+port+"/db");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -35,12 +39,7 @@ public class ServerFacade {
         writer.write(json);
         writer.close();
 
-        if (connection.getResponseCode() != 200) {
-            var errorStream = connection.getErrorStream();
-            var reader = new InputStreamReader(errorStream);
-            var error = new Gson().fromJson(reader, Map.class);
-            throw new Exception((String) error.get("message"));
-        }
+        throwIfError(connection);
 
     }
     public int createGame(String authToken, String gameName)throws Exception{
@@ -59,12 +58,7 @@ public class ServerFacade {
         writer.write(json);
         writer.close();
 
-        if (connection.getResponseCode() != 200) {
-            var errorStream = connection.getErrorStream();
-            var reader = new InputStreamReader(errorStream);
-            var error = new Gson().fromJson(reader, Map.class);
-            throw new Exception((String) error.get("message"));
-        }
+        throwIfError(connection);
 
         var inputStream = connection.getInputStream();
         var reader = new InputStreamReader(inputStream);
@@ -89,12 +83,7 @@ public class ServerFacade {
         writer.write(json);
         writer.close();
 
-        if (connection.getResponseCode() != 200) {
-            var errorStream = connection.getErrorStream();
-            var reader = new InputStreamReader(errorStream);
-            var error = new Gson().fromJson(reader, Map.class);
-            throw new Exception((String) error.get("message"));
-        }
+        throwIfError(connection);
 
     }
 
@@ -105,12 +94,7 @@ public class ServerFacade {
         connection.addRequestProperty("authorization", authToken);
         connection.setRequestMethod("GET");
 
-        if (connection.getResponseCode() != 200) {
-            var errorStream = connection.getErrorStream();
-            var reader = new InputStreamReader(errorStream);
-            var error = new Gson().fromJson(reader, Map.class);
-            throw new Exception((String) error.get("message"));
-        }
+        throwIfError(connection);
 
         var inputStream = connection.getInputStream();
         var reader = new InputStreamReader(inputStream);
@@ -136,12 +120,7 @@ public class ServerFacade {
         writer.write(json);
         writer.close();
 
-        if (connection.getResponseCode() != 200) {
-            var errorStream = connection.getErrorStream();
-            var reader = new InputStreamReader(errorStream);
-            var error = new Gson().fromJson(reader, Map.class);
-            throw new Exception((String) error.get("message"));
-        }
+        throwIfError(connection);
 
         var inputStream = connection.getInputStream();
         var reader = new InputStreamReader(inputStream);
@@ -155,12 +134,7 @@ public class ServerFacade {
         connection.addRequestProperty("authorization", authToken);
         connection.setRequestMethod("DELETE");
 
-        if (connection.getResponseCode() != 200) {
-            var errorStream = connection.getErrorStream();
-            var reader = new InputStreamReader(errorStream);
-            var error = new Gson().fromJson(reader, Map.class);
-            throw new Exception((String) error.get("message"));
-        }
+        throwIfError(connection);
 
         var inputStream = connection.getInputStream();
     }
@@ -180,12 +154,7 @@ public class ServerFacade {
         writer.write(json);
         writer.close();
 
-        if (connection.getResponseCode() != 200) {
-            var errorStream = connection.getErrorStream();
-            var reader = new InputStreamReader(errorStream);
-            var error = new Gson().fromJson(reader, Map.class);
-            throw new Exception((String) error.get("message"));
-        }
+        throwIfError(connection);
 
         var inputStream = connection.getInputStream();
         var reader = new InputStreamReader(inputStream);

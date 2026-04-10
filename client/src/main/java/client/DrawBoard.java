@@ -45,19 +45,20 @@ public class DrawBoard {
     }
 
     private static void drawWhiteBoard(ChessBoard board, Set<ChessPosition> highlights, ChessPosition selected) {
-        printLetterBorder(WHITE_COLS);
-        for (int row : WHITE_ROW_ORDER) {
-            printRow(board, row, WHITE_COL_NUMS, highlights, selected);
-        }
-        printLetterBorder(WHITE_COLS);
+        drawOriented(board, highlights, selected, WHITE_COLS, WHITE_ROW_ORDER, WHITE_COL_NUMS);
     }
 
     private static void drawBlackBoard(ChessBoard board, Set<ChessPosition> highlights, ChessPosition selected) {
-        printLetterBorder(BLACK_COLS);
-        for (int row : BLACK_ROW_ORDER) {
-            printRow(board, row, BLACK_COL_NUMS, highlights, selected);
+        drawOriented(board, highlights, selected, BLACK_COLS, BLACK_ROW_ORDER, BLACK_COL_NUMS);
+    }
+
+    private static void drawOriented(ChessBoard board, Set<ChessPosition> highlights, ChessPosition selected,
+                                     String[] cols, int[] rowOrder, int[] colNums) {
+        printLetterBorder(cols);
+        for (int row : rowOrder) {
+            printRow(board, row, colNums, highlights, selected);
         }
-        printLetterBorder(BLACK_COLS);
+        printLetterBorder(cols);
     }
 
     private static void printLetterBorder(String[] cols) {

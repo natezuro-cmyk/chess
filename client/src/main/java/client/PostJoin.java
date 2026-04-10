@@ -56,7 +56,7 @@ public class PostJoin {
 
 
     private String highlight(String[] params) {
-        if (params.length < 1) return "Usage: highlight <position>  (e.g. highlight e2)";
+        if (params.length < 1) { return "Usage: highlight <position>  (e.g. highlight e2)"; }
         ChessPosition pos = getPosition(params[0]);
         facade.highlight(pos);
         return "";

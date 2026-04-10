@@ -32,12 +32,14 @@ public class MySqlDataAccessTests {
         assertNull(dataAccess.getGame(1));
     }
 
+    private UserData createAndGetBilly() throws Exception {
+        dataAccess.createUser(new UserData("billy", "1234", "billy@gmail.com"));
+        return dataAccess.getUser("billy");
+    }
+
     @Test
     public void okCreateUser() throws Exception {
-        UserData user = new UserData("billy", "1234", "billy@gmail.com");
-        dataAccess.createUser(user);
-        UserData data = dataAccess.getUser("billy");
-
+        UserData data = createAndGetBilly();
         assertEquals("billy", data.username());
         assertEquals("billy@gmail.com", data.email());
     }
@@ -50,10 +52,7 @@ public class MySqlDataAccessTests {
 
     @Test
     public void okGetUser() throws Exception {
-        UserData user = new UserData("billy", "1234", "billy@gmail.com");
-        dataAccess.createUser(user);
-        UserData data = dataAccess.getUser("billy");
-
+        UserData data = createAndGetBilly();
         assertEquals("billy", data.username());
         assertEquals("billy@gmail.com", data.email());
     }

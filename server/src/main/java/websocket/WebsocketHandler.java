@@ -59,7 +59,8 @@ public class WebsocketHandler{
     public void connect(UserGameCommand userGameCommand, Session session) throws DataAccessException, IOException {
         //checks the authtoken to make sure the player is logged in
         if(dataAccess.getAuth(userGameCommand.getAuthToken())== null){
-            ServerMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: person either doesn't exist or isn't logged in.");
+            ServerMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR,
+                    "Error: person either doesn't exist or isn't logged in.");
             session.getRemote().sendString(new Gson().toJson(errorMessage));
             return;
         }
@@ -74,15 +75,17 @@ public class WebsocketHandler{
         GameData game = dataAccess.getGame(userGameCommand.getGameID());
         String username = dataAccess.getAuth(userGameCommand.getAuthToken()).username();
         String color = "an observer.";
-        if(username.equals(game.whiteUsername())) color = "white";
-        if(username.equals(game.blackUsername())) color = "black";
+        if (username.equals(game.whiteUsername())) { color = "white"; }
+        if (username.equals(game.blackUsername())) { color = "black"; }
 
         //send a message to all player about who has joined
-        ServerMessage notificationMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, username +" has joined the game as " + color);
+        ServerMessage notificationMessage = new NotificationMessage(
+                ServerMessage.ServerMessageType.NOTIFICATION, username + " has joined the game as " + color);
         connections.broadcast(userGameCommand.getGameID(), session, notificationMessage);
 
         //if you connect it needs to load the game for you
-        ServerMessage loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game, dataAccess.getAuth(userGameCommand.getAuthToken()));
+        AuthData auth = dataAccess.getAuth(userGameCommand.getAuthToken());
+        ServerMessage loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game, auth);
         session.getRemote().sendString(new Gson().toJson(loadGame));
     }
 
@@ -118,7 +121,8 @@ public class WebsocketHandler{
         else if(game.blackUsername().equals(authData.username())){playerColor = ChessGame.TeamColor.BLACK;}
 
         if(playerColor != game.game().getTeamTurn()){
-            ServerMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: it is " + game.game().getTeamTurn() + "'s turn.");
+            ServerMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR,
+                    "Error: it is " + game.game().getTeamTurn() + "'s turn.");
             session.getRemote().sendString(new Gson().toJson(errorMessage));
             return;
         }
@@ -142,7 +146,9 @@ public class WebsocketHandler{
                     username +" moved their " + piece + " from " + startPosition +" to " + endPosition);
             connections.broadcast(userGameCommand.getGameID(), session, notificationMessage);
 
-            ServerMessage loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, newGame, dataAccess.getAuth(userGameCommand.getAuthToken()));
+            AuthData moveAuth = dataAccess.getAuth(userGameCommand.getAuthToken());
+            ServerMessage loadGame = new LoadGameMessage(
+                    ServerMessage.ServerMessageType.LOAD_GAME, newGame, moveAuth);
             connections.broadcast(userGameCommand.getGameID(), null, loadGame);
 
             //Check if a color is in check, checkmate or stalemate

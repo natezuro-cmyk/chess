@@ -17,7 +17,11 @@ public class MySqlDataAccess implements DataAccess {
     public void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()){
-            String[] statements = new String[]{"CREATE TABLE IF NOT EXISTS games(gameID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, whiteUsername VARCHAR(255), blackUsername VARCHAR(255), gameName VARCHAR(255) NOT NULL, game TEXT NOT NULL);",
+            String createGames = "CREATE TABLE IF NOT EXISTS games(" +
+                    "gameID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
+                    "whiteUsername VARCHAR(255), blackUsername VARCHAR(255), " +
+                    "gameName VARCHAR(255) NOT NULL, game TEXT NOT NULL);";
+            String[] statements = new String[]{createGames,
                     "CREATE TABLE IF NOT EXISTS users (username VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL);",
                     "CREATE TABLE IF NOT EXISTS authTokens (authToken VARCHAR(255) NOT NULL, username VARCHAR(255) NOT NULL);"};
             for(String statement: statements) {
