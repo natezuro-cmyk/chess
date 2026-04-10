@@ -37,12 +37,6 @@ public class Server {
         createGameService = new CreateGameService(dataAccess);
         joinGameService = new JoinGameService(dataAccess);
 
-        try {
-            clearService.clear();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-
         javalin = Javalin.create(config -> {
             config.staticFiles.add("web");
             config.jsonMapper(new io.javalin.json.JavalinGson());
