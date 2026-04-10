@@ -11,6 +11,7 @@ public class PostLogin {
     private List<GameData> games;
     private ServerFacade facade;
     private PreLogin preLogin;
+    private WebSocketFacade webFacade;
     String username;
 
     public PostLogin(ServerFacade facade){
@@ -81,16 +82,15 @@ public class PostLogin {
         if (params.length >= 2) {
             if (games == null) throw new Exception("Please run 'list' before playing a game.");
             int i;
-            try { i = Integer.parseInt(params[0]); }
+            try {i = Integer.parseInt(params[0]); }
             catch (NumberFormatException e) { throw new Exception("Please enter a valid game number."); }
             if (i < 1 || i > games.size()) throw new Exception("Game number out of range. Run 'list' to see available games.");
             ChessGame.TeamColor perspective;
             try { perspective = ChessGame.TeamColor.valueOf(params[1].toUpperCase()); }
             catch (IllegalArgumentException e) { throw new Exception("Invalid color. Please enter WHITE or BLACK."); }
             facade.joinGame(authToken, games.get(i - 1).gameID(), params[1].toUpperCase());
-            ChessBoard board = new ChessBoard();
-            board.resetBoard();
-            DrawBoard.drawBoard(board, perspective);
+            webFacade = new WebSocketFacade("http://localhost:" + facade.port);
+            webFacade.connect(games.get(i - 1).gameID(), authToken);
             username = params[1].toUpperCase();
             return "Joined game as " + params[1].toUpperCase() + ".";
         }
@@ -104,9 +104,9 @@ public class PostLogin {
             try { i = Integer.parseInt(params[0]); }
             catch (NumberFormatException e) { throw new Exception("Please enter a valid game number."); }
             if (i < 1 || i > games.size()) throw new Exception("Game number not in range. Type 'list' to see available games.");
-            ChessBoard board = new ChessBoard();
-            board.resetBoard();
-            DrawBoard.drawBoard(board, ChessGame.TeamColor.WHITE);
+            webFacade = new WebSocketFacade("http://localhost:" + facade.port);
+            webFacade.connect(games.get(i - 1).gameID(), preLogin.getAuthToken());
+            username = params[1].toUpperCase();
             return "Observing game " + params[0];
         }
         throw new Exception("Please enter a game number.");
@@ -116,4 +116,7 @@ public class PostLogin {
         return this.username;
     }
 
+    public WebSocketFacade getWebFacade() {
+        return webFacade;
+    }
 }

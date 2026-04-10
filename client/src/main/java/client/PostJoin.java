@@ -57,12 +57,13 @@ public class PostJoin {
         ChessPosition endPos = getPosition(params[1]);
         ChessMove move = new ChessMove (startPos, endPos, null);
         facade.makeMove(move, authToken);
+
         return "Making move.";
     }
 
     private String leave(String authToken) throws Exception {
         facade.leave(authToken);
-        return"Leaving game.";
+        return "Leaving game.";
     }
 
     private String resign(String authToken) throws Exception {

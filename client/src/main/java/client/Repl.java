@@ -9,7 +9,7 @@ public class Repl {
     private PostLogin postLogin;
     private PostJoin postJoin;
     private boolean loggedIn;
-    private boolean postJoinBool;
+    private boolean postJoinBool = false;
     private String authToken = null;
     int port;
 
@@ -30,34 +30,29 @@ public class Repl {
             String line = scanner.nextLine();
             if(authToken == null){
                 result = preLogin.eval(line);
-                System.out.print(result);
+                System.out.println(result);
                 authToken = preLogin.getAuthToken();
 
             }
-            else{
+            else if(authToken != null && !postJoinBool){
                 result = postLogin.eval(line, authToken);
-                System.out.print(result);
+                System.out.println(result);
                 if(result.equals("You have been logged out.")){
                     loggedIn = false;
                     authToken = null;
                 }
                 if(result.equals("Joined game as " + postLogin.getName() + ".")){
-                    webFacade = new WebSocketFacade("http://localhost:" + port);
+                    webFacade = postLogin.getWebFacade();
                     postJoin = new PostJoin(webFacade);
-                    result = postJoin.eval(line, authToken);
-                    System.out.print(result);
                     postJoinBool = true;
                 }
+            }
+            else if(postJoinBool){
+                result = postJoin.eval(line, authToken);
+                System.out.println(result);
                 if(result.equals("Leaving game.")){
                     postJoinBool = false;
-                    result = postLogin.eval(line, authToken);
-                    System.out.print(result);
                 }
-
-            }
-            if(postJoinBool){
-                result = postJoin.eval(line, authToken);
-                System.out.print(result);
             }
         }
         System.out.println();

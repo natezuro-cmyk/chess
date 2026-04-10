@@ -45,9 +45,9 @@ public class WebSocketFacade extends Endpoint {
                     ServerMessage messageType = new Gson().fromJson(message, ServerMessage.class);
                     switch (messageType.getServerMessageType()) {
                         case ServerMessage.ServerMessageType.LOAD_GAME:
-                                gameData = new Gson().fromJson(message, LoadGameMessage.class).getGame();
-                                gameID = gameData.gameID();
-                            loadGame(new Gson().fromJson(message, LoadGameMessage.class), new Gson().fromJson(message, LoadGameMessage.class).getUserData());
+                                LoadGameMessage gameMessage = new Gson().fromJson(message, LoadGameMessage.class);
+                                gameID = gameMessage.getGame().gameID();
+                            loadGame(gameMessage, gameMessage.getUserData());
                             break;
 
                         case ServerMessage.ServerMessageType.ERROR: error(new Gson().fromJson(message, ErrorMessage.class));
@@ -71,7 +71,7 @@ public class WebSocketFacade extends Endpoint {
     public void loadGame(LoadGameMessage message, AuthData data) {
     //needs to know who is calling it, white player, black player or observer
         //draws either white or black board depending on who's playing
-        GameData gameData = message.getGame();
+        this.gameData = message.getGame();
         String whiteUsername = gameData.whiteUsername();
         String blackUsername = gameData.blackUsername();
         this.authData = data;
@@ -99,22 +99,27 @@ public class WebSocketFacade extends Endpoint {
     }
 
     public void makeMove(ChessMove move, String authToken) throws IOException {
-        UserGameCommand makeMove = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameData.gameID(), move);
+        UserGameCommand makeMove = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move);
         session.getBasicRemote().sendText(new Gson().toJson(makeMove));
     }
 
     public void leave(String authToken) throws IOException {
-        UserGameCommand leaveGame = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameData.gameID());
+        UserGameCommand leaveGame = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
         session.getBasicRemote().sendText(new Gson().toJson(leaveGame));
     }
 
     public void resign(String authToken) throws IOException {
-        UserGameCommand resign = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameData.gameID());
+        UserGameCommand resign = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
         session.getBasicRemote().sendText(new Gson().toJson(resign));
     }
 
     public void redraw(String authToken) throws IOException {
         loadGame(new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, authData), authData);
+    }
+
+    public void connect(int gameID, String authToken) throws IOException {
+        UserGameCommand connection = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+        session.getBasicRemote().sendText(new Gson().toJson(connection));
     }
 
 
