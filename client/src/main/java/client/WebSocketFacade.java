@@ -1,13 +1,17 @@
 package client;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import exception.ResponseException;
+
 
 import jakarta.websocket.*;
 import model.AuthData;
 import model.GameData;
 
+import websocket.commands.MakeMoveCommand;
+import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -23,6 +27,9 @@ public class WebSocketFacade extends Endpoint {
     Session session;
     ServerMessage serverMessage;
     private ServerFacade facade;
+    private GameData gameData;
+    private AuthData authData;
+    private int gameID;
 
     public WebSocketFacade(String url) throws ResponseException {
         try {
@@ -38,9 +45,18 @@ public class WebSocketFacade extends Endpoint {
                 public void onMessage(String message) {
                     ServerMessage messageType = new Gson().fromJson(message, ServerMessage.class);
                     switch (messageType.getServerMessageType()) {
-                        case ServerMessage.ServerMessageType.LOAD_GAME -> loadGame(new Gson().fromJson(message, LoadGameMessage.class), new Gson().fromJson(message, LoadGameMessage.class).getUserData());
-                        case ServerMessage.ServerMessageType.ERROR -> error(new Gson().fromJson(message, ErrorMessage.class));
-                        case ServerMessage.ServerMessageType.NOTIFICATION -> notification(new Gson().fromJson(message, NotificationMessage.class));
+                        case ServerMessage.ServerMessageType.LOAD_GAME:
+                                gameData = new Gson().fromJson(message, LoadGameMessage.class).getGame();
+                                gameID = gameData.gameID();
+                                authData = new Gson().fromJson(message, LoadGameMessage.class).getUserData();
+                            loadGame(new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, authData), authData);
+                            break;
+
+                        case ServerMessage.ServerMessageType.ERROR: error(new Gson().fromJson(message, ErrorMessage.class));
+                        break;
+
+                        case ServerMessage.ServerMessageType.NOTIFICATION: notification(new Gson().fromJson(message, NotificationMessage.class));
+                        break;
                     }
                 }
             });
@@ -60,18 +76,18 @@ public class WebSocketFacade extends Endpoint {
         GameData gameData = message.getGame();
         String whiteUsername = gameData.whiteUsername();
         String blackUsername = gameData.blackUsername();
-        AuthData userData = message.getUserData();
+        this.authData = message.getUserData();
 
-        if(userData.username().equals(whiteUsername)) {
-            PostJoin.drawBoard(gameData.game().getBoard(), ChessGame.TeamColor.WHITE);
+        if(authData.username().equals(whiteUsername)) {
+            DrawBoard.drawBoard(gameData.game().getBoard(), ChessGame.TeamColor.WHITE);
         }
 
-        else if(userData.username().equals(blackUsername)){
-            PostJoin.drawBoard(gameData.game().getBoard(), ChessGame.TeamColor.BLACK);
+        else if(authData.username().equals(blackUsername)){
+            DrawBoard.drawBoard(gameData.game().getBoard(), ChessGame.TeamColor.BLACK);
         }
 
         else{
-            PostJoin.drawBoard(gameData.game().getBoard(), ChessGame.TeamColor.WHITE);
+            DrawBoard.drawBoard(gameData.game().getBoard(), ChessGame.TeamColor.WHITE);
         }
 
     }
@@ -83,5 +99,21 @@ public class WebSocketFacade extends Endpoint {
     public void notification(NotificationMessage message) {
         System.out.println(message.getMessage());
     }
+
+    public void makeMove(ChessMove move, String authToken) throws IOException {
+        UserGameCommand makeMove = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameData.gameID(), move);
+        session.getBasicRemote().sendText(new Gson().toJson(makeMove));
+    }
+
+    public void leave(String authToken) throws IOException {
+        UserGameCommand leaveGame = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameData.gameID());
+        session.getBasicRemote().sendText(new Gson().toJson(leaveGame));
+    }
+
+    public void resign(String authToken) throws IOException {
+        UserGameCommand resign = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameData.gameID());
+        session.getBasicRemote().sendText(new Gson().toJson(resign));
+    }
+
 
 }

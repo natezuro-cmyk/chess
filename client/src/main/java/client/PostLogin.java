@@ -89,7 +89,7 @@ public class PostLogin {
             facade.joinGame(authToken, games.get(i - 1).gameID(), params[1].toUpperCase());
             ChessBoard board = new ChessBoard();
             board.resetBoard();
-            PostJoin.drawBoard(board, perspective);
+            DrawBoard.drawBoard(board, perspective);
             return "Joined game as " + params[1].toUpperCase() + ".";
         }
         throw new Exception("Please enter a game number and color.");
@@ -104,7 +104,7 @@ public class PostLogin {
             if (i < 1 || i > games.size()) throw new Exception("Game number not in range. Type 'list' to see available games.");
             ChessBoard board = new ChessBoard();
             board.resetBoard();
-            PostJoin.drawBoard(board, ChessGame.TeamColor.WHITE);
+            DrawBoard.drawBoard(board, ChessGame.TeamColor.WHITE);
             return "Observing game " + params[0];
         }
         throw new Exception("Please enter a game number.");
