@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import model.*;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -11,6 +12,7 @@ import java.util.List;
 
 
 public class MySqlDataAccess implements DataAccess {
+    private static final Gson GSON = new GsonBuilder().serializeNulls().create();
 
     public void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
@@ -113,7 +115,7 @@ public class MySqlDataAccess implements DataAccess {
                 ResultSet data = preparedStatement.executeQuery();
                 if(data.next()){
                     String json = data.getString("game");
-                    ChessGame game = new Gson().fromJson(json, ChessGame.class);
+                    ChessGame game = GSON.fromJson(json, ChessGame.class);
                     return new GameData(data.getInt("gameID"), data.getString("whiteUsername"),
                             data.getString("blackUsername"), data.getString("gameName"),
                             game);
@@ -150,7 +152,7 @@ public class MySqlDataAccess implements DataAccess {
     public void updateGame(GameData game) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()){
             String statement = "UPDATE games SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?";
-            String gameJson = new Gson().toJson(game.game());
+            String gameJson = GSON.toJson(game.game());
             try(var preparedStatement = conn.prepareStatement(statement)){
                 preparedStatement.setString(1, game.whiteUsername());
                 preparedStatement.setString(2, game.blackUsername());

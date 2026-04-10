@@ -24,6 +24,12 @@ public class CreateGameService {
         if(authData.authToken() == null || data.getAuth(authData.authToken()) == null){
             throw new UnauthorizedException("unauthorized");
         }
+        List<GameData> games = data.listGames();
+        for (GameData game : games) {
+            if (game.gameName().equals(gameName)) {
+                throw new BadRequestException("a game with that name already exists");
+            }
+        }
         int gameID = data.createGame(gameName);
         return gameID;
     }

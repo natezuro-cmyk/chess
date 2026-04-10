@@ -16,8 +16,6 @@ import static java.util.Objects.hash;
  * signature of the existing methods.
  */
 public class ChessGame {
-
-
     TeamColor turn;
     ChessBoard board = new ChessBoard();
 
@@ -25,14 +23,12 @@ public class ChessGame {
     public ChessGame() {
         board.resetBoard();
         this.turn = TeamColor.WHITE;
-        ChessBoard board = new ChessBoard();
     }
 
 
     public ChessGame(ChessBoard board, TeamColor color) {
         this.board = board;
         this.turn = color;
-        this.turn = TeamColor.WHITE;
     }
 
 

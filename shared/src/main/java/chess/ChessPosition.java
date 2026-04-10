@@ -46,6 +46,7 @@ public class ChessPosition {
     }
 
     public String toString(){
-        return("Row: " + getRow() + " Column: " + getColumn());
+        char colLetter = (char) ('a' + col - 1);
+        return "" + colLetter + row;
     }
 }

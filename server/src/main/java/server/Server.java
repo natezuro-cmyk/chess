@@ -6,6 +6,7 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 import service.*;
+import websocket.WebsocketHandler;
 
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,12 @@ public class Server {
         createGameService = new CreateGameService(dataAccess);
         joinGameService = new JoinGameService(dataAccess);
 
+        try {
+            clearService.clear();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+
         javalin = Javalin.create(config -> {
             config.staticFiles.add("web");
             config.jsonMapper(new io.javalin.json.JavalinGson());
@@ -47,6 +54,7 @@ public class Server {
         listGamesHandler();
         createGameHandler();
         joinGameHandler();
+        webSocketHandler();
     }
 
     public int run(int desiredPort) {
@@ -204,6 +212,16 @@ public class Server {
                 ctx.status(500);
                 ctx.json(Map.of("message", "Error: " + e.getMessage()));
             }
+        });
+    }
+
+    public void webSocketHandler() {
+        WebsocketHandler handler = new WebsocketHandler();
+
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(handler::onConnect);
+            ws.onMessage(handler::onMessage);
+            ws.onClose(handler::onClose);
         });
     }
 
