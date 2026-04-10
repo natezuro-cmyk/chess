@@ -6,6 +6,7 @@ import websocket.commands.UserGameCommand;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 public class PostJoin {
 
@@ -24,6 +25,7 @@ public class PostJoin {
             return switch (cmd) {
                 case "help" -> help();
                 case "move" -> makeMove(params, authToken);
+                case "highlight" -> highlight(params);
                 case "leave" -> leave(authToken);
                 case "resign" -> resign(authToken);
                 case "redraw" -> redraw(authToken);
@@ -37,7 +39,8 @@ public class PostJoin {
     public String help(){
         return """
                 - help
-                - move
+                - move <from> <to>   (e.g. move e2 e4)
+                - highlight <pos>    (e.g. highlight e2)
                 - leave
                 - resign
                 - redraw
@@ -51,6 +54,13 @@ public class PostJoin {
         return new ChessPosition(row,col);
     }
 
+
+    private String highlight(String[] params) {
+        if (params.length < 1) return "Usage: highlight <position>  (e.g. highlight e2)";
+        ChessPosition pos = getPosition(params[0]);
+        facade.highlight(pos);
+        return "";
+    }
 
     private String makeMove(String[] params, String authToken) throws Exception{
         ChessPosition startPos = getPosition(params[0]);
@@ -67,8 +77,14 @@ public class PostJoin {
     }
 
     private String resign(String authToken) throws Exception {
-        facade.resign(authToken);
-        return "Resigning.";
+        System.out.print("Are you sure you want to resign? (yes/no): ");
+        Scanner scanner = new Scanner(System.in);
+        String confirmation = scanner.nextLine().trim().toLowerCase();
+        if (confirmation.equals("yes") || confirmation.equals("y")) {
+            facade.resign(authToken);
+            return "Resigning.";
+        }
+        return "Resign cancelled.";
     }
 
     private String redraw(String authToken) throws Exception {

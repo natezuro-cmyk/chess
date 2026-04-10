@@ -22,7 +22,7 @@ public class Repl {
 
     public void run() {
         System.out.println("Welcome to Chess.");
-        System.out.print(preLogin.help());
+        System.out.println(preLogin.help());
 
         Scanner scanner = new Scanner(System.in);
         var result = "";
@@ -41,7 +41,7 @@ public class Repl {
                     loggedIn = false;
                     authToken = null;
                 }
-                if(result.equals("Joined game as " + postLogin.getName() + ".")){
+                if(result.equals("Joined game as " + postLogin.getName() + ".") || result.startsWith("Observing game")){
                     webFacade = postLogin.getWebFacade();
                     postJoin = new PostJoin(webFacade);
                     postJoinBool = true;

@@ -30,7 +30,7 @@ public class PostLogin {
                 case "list" -> listGames(authToken);
                 case "create" -> createGame(params, authToken);
                 case "play" -> playGame(params, authToken);
-                case "observe" -> observeGame(params);
+                case "observe" -> observeGame(params, authToken);
                 case "quit" -> "quit";
                 default -> "Unknown command. Type 'help' to see available commands.";
             };
@@ -97,7 +97,7 @@ public class PostLogin {
         throw new Exception("Please enter a game number and color.");
     }
 
-    private String observeGame(String[] params) throws Exception{
+    private String observeGame(String[] params, String authToken) throws Exception{
         if (params.length >= 1) {
             if (games == null) throw new Exception("Please run 'list' before observing a game.");
             int i;
@@ -105,9 +105,9 @@ public class PostLogin {
             catch (NumberFormatException e) { throw new Exception("Please enter a valid game number."); }
             if (i < 1 || i > games.size()) throw new Exception("Game number not in range. Type 'list' to see available games.");
             webFacade = new WebSocketFacade("http://localhost:" + facade.port);
-            webFacade.connect(games.get(i - 1).gameID(), preLogin.getAuthToken());
-            username = params[1].toUpperCase();
-            return "Observing game " + params[0];
+            webFacade.connect(games.get(i - 1).gameID(), authToken);
+            username = "observer";
+            return "Observing game " + params[0] + ".";
         }
         throw new Exception("Please enter a game number.");
     }

@@ -3,11 +3,17 @@ package client;
 import chess.*;
 import ui.EscapeSequences;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 public class DrawBoard {
 
-    private static final String LIGHT_SQUARE = EscapeSequences.SET_BG_COLOR_GREEN;
-    private static final String DARK_SQUARE  = EscapeSequences.SET_BG_COLOR_WHITE;
-    private static final String BORDER       = EscapeSequences.SET_BG_COLOR_DARK_GREY;
+    private static final String LIGHT_SQUARE    = EscapeSequences.SET_BG_COLOR_GREEN;
+    private static final String DARK_SQUARE     = EscapeSequences.SET_BG_COLOR_WHITE;
+    private static final String BORDER          = EscapeSequences.SET_BG_COLOR_DARK_GREY;
+    private static final String HIGHLIGHT_VALID = EscapeSequences.SET_BG_COLOR_DARK_GREEN;
+    private static final String HIGHLIGHT_SELECTED = EscapeSequences.SET_BG_COLOR_YELLOW;
 
     private static final String[] WHITE_COLS = {"a", "b", "c", "d", "e", "f", "g", "h"};
     private static final String[] BLACK_COLS = {"h", "g", "f", "e", "d", "c", "b", "a"};
@@ -19,26 +25,37 @@ public class DrawBoard {
     private static final int[] BLACK_ROW_ORDER = {1, 2, 3, 4, 5, 6, 7, 8}; // row 1 at top, row 8 at bottom
 
     public static void drawBoard(ChessBoard board, ChessGame.TeamColor perspective) {
+        drawBoard(board, perspective, null, null);
+    }
+
+    public static void drawBoard(ChessBoard board, ChessGame.TeamColor perspective,
+                                 Collection<ChessMove> validMoves, ChessPosition selected) {
+        Set<ChessPosition> highlights = new HashSet<>();
+        if (validMoves != null) {
+            for (ChessMove move : validMoves) {
+                highlights.add(move.getEndPosition());
+            }
+        }
         if (perspective == ChessGame.TeamColor.WHITE) {
-            drawWhiteBoard(board);
+            drawWhiteBoard(board, highlights, selected);
         } else {
-            drawBlackBoard(board);
+            drawBlackBoard(board, highlights, selected);
         }
         System.out.print(EscapeSequences.RESET_BG_COLOR + EscapeSequences.RESET_TEXT_COLOR);
     }
 
-    private static void drawWhiteBoard(ChessBoard board) {
+    private static void drawWhiteBoard(ChessBoard board, Set<ChessPosition> highlights, ChessPosition selected) {
         printLetterBorder(WHITE_COLS);
         for (int row : WHITE_ROW_ORDER) {
-            printRow(board, row, WHITE_COL_NUMS);
+            printRow(board, row, WHITE_COL_NUMS, highlights, selected);
         }
         printLetterBorder(WHITE_COLS);
     }
 
-    private static void drawBlackBoard(ChessBoard board) {
+    private static void drawBlackBoard(ChessBoard board, Set<ChessPosition> highlights, ChessPosition selected) {
         printLetterBorder(BLACK_COLS);
         for (int row : BLACK_ROW_ORDER) {
-            printRow(board, row, BLACK_COL_NUMS);
+            printRow(board, row, BLACK_COL_NUMS, highlights, selected);
         }
         printLetterBorder(BLACK_COLS);
     }
@@ -52,14 +69,23 @@ public class DrawBoard {
         System.out.println();
     }
 
-    private static void printRow(ChessBoard board, int row, int[] colNums) {
+    private static void printRow(ChessBoard board, int row, int[] colNums,
+                                  Set<ChessPosition> highlights, ChessPosition selected) {
         // Left row number
         System.out.print(BORDER + " " + row + " " + EscapeSequences.RESET_BG_COLOR);
 
         // Print each square in the row
         for (int col : colNums) {
-            String squareColor = getSquareColor(row, col);
-            String pieceSymbol = getPieceSymbol(board.getPiece(new ChessPosition(row, col)));
+            ChessPosition pos = new ChessPosition(row, col);
+            String squareColor;
+            if (selected != null && selected.equals(pos)) {
+                squareColor = HIGHLIGHT_SELECTED;
+            } else if (highlights != null && highlights.contains(pos)) {
+                squareColor = HIGHLIGHT_VALID;
+            } else {
+                squareColor = getSquareColor(row, col);
+            }
+            String pieceSymbol = getPieceSymbol(board.getPiece(pos));
             System.out.print(squareColor + pieceSymbol + EscapeSequences.RESET_BG_COLOR);
         }
 

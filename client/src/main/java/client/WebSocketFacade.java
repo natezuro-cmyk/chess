@@ -2,6 +2,7 @@ package client;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 
 
@@ -47,7 +48,8 @@ public class WebSocketFacade extends Endpoint {
                         case ServerMessage.ServerMessageType.LOAD_GAME:
                                 LoadGameMessage gameMessage = new Gson().fromJson(message, LoadGameMessage.class);
                                 gameID = gameMessage.getGame().gameID();
-                            loadGame(gameMessage, gameMessage.getUserData());
+                                AuthData authToUse = (authData != null) ? authData : gameMessage.getUserData();
+                            loadGame(gameMessage, authToUse);
                             break;
 
                         case ServerMessage.ServerMessageType.ERROR: error(new Gson().fromJson(message, ErrorMessage.class));
@@ -115,6 +117,15 @@ public class WebSocketFacade extends Endpoint {
 
     public void redraw(String authToken) throws IOException {
         loadGame(new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, authData), authData);
+    }
+
+    public void highlight(ChessPosition pos) {
+        if (gameData == null) { System.out.println("No game loaded."); return; }
+        ChessGame game = gameData.game();
+        java.util.Collection<ChessMove> validMoves = game.validMoves(pos);
+        ChessGame.TeamColor perspective = (authData != null && authData.username().equals(gameData.blackUsername()))
+                ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+        DrawBoard.drawBoard(gameData.game().getBoard(), perspective, validMoves, pos);
     }
 
     public void connect(int gameID, String authToken) throws IOException {
