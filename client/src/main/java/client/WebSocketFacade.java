@@ -3,7 +3,6 @@ package client;
 import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
-import exception.ResponseException;
 
 
 import jakarta.websocket.*;
@@ -31,7 +30,7 @@ public class WebSocketFacade extends Endpoint {
     private AuthData authData;
     private int gameID;
 
-    public WebSocketFacade(String url) throws ResponseException {
+    public WebSocketFacade(String url){
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
@@ -48,8 +47,7 @@ public class WebSocketFacade extends Endpoint {
                         case ServerMessage.ServerMessageType.LOAD_GAME:
                                 gameData = new Gson().fromJson(message, LoadGameMessage.class).getGame();
                                 gameID = gameData.gameID();
-                                authData = new Gson().fromJson(message, LoadGameMessage.class).getUserData();
-                            loadGame(new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, authData), authData);
+                            loadGame(new Gson().fromJson(message, LoadGameMessage.class), new Gson().fromJson(message, LoadGameMessage.class).getUserData());
                             break;
 
                         case ServerMessage.ServerMessageType.ERROR: error(new Gson().fromJson(message, ErrorMessage.class));
@@ -60,8 +58,8 @@ public class WebSocketFacade extends Endpoint {
                     }
                 }
             });
-        } catch (DeploymentException | IOException | URISyntaxException ex) {
-            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
+        } catch (Exception ex) {
+            System.out.println("WebSocket error: " + ex.getMessage());
         }
     }
 
@@ -76,7 +74,7 @@ public class WebSocketFacade extends Endpoint {
         GameData gameData = message.getGame();
         String whiteUsername = gameData.whiteUsername();
         String blackUsername = gameData.blackUsername();
-        this.authData = message.getUserData();
+        this.authData = data;
 
         if(authData.username().equals(whiteUsername)) {
             DrawBoard.drawBoard(gameData.game().getBoard(), ChessGame.TeamColor.WHITE);
@@ -113,6 +111,10 @@ public class WebSocketFacade extends Endpoint {
     public void resign(String authToken) throws IOException {
         UserGameCommand resign = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameData.gameID());
         session.getBasicRemote().sendText(new Gson().toJson(resign));
+    }
+
+    public void redraw(String authToken) throws IOException {
+        loadGame(new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameData, authData), authData);
     }
 
 

@@ -4,19 +4,23 @@ import java.util.Scanner;
 
 public class Repl {
     private ServerFacade facade;
+    private WebSocketFacade webFacade;
     private PreLogin preLogin;
     private PostLogin postLogin;
-    private Scanner scanner;
-    private boolean loggedIn = false;
+    private PostJoin postJoin;
+    private boolean loggedIn;
+    private boolean postJoinBool;
     private String authToken = null;
+    int port;
 
     public Repl(int port){
+        this.port = port;
         facade = new ServerFacade(port);
         preLogin = new PreLogin(facade);
         postLogin = new PostLogin(facade);
     }
 
-    public void run(){
+    public void run() {
         System.out.println("Welcome to Chess.");
         System.out.print(preLogin.help());
 
@@ -37,6 +41,23 @@ public class Repl {
                     loggedIn = false;
                     authToken = null;
                 }
+                if(result.equals("Joined game as " + postLogin.getName() + ".")){
+                    webFacade = new WebSocketFacade("http://localhost:" + port);
+                    postJoin = new PostJoin(webFacade);
+                    result = postJoin.eval(line, authToken);
+                    System.out.print(result);
+                    postJoinBool = true;
+                }
+                if(result.equals("Leaving game.")){
+                    postJoinBool = false;
+                    result = postLogin.eval(line, authToken);
+                    System.out.print(result);
+                }
+
+            }
+            if(postJoinBool){
+                result = postJoin.eval(line, authToken);
+                System.out.print(result);
             }
         }
         System.out.println();

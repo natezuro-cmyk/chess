@@ -11,6 +11,7 @@ public class PostLogin {
     private List<GameData> games;
     private ServerFacade facade;
     private PreLogin preLogin;
+    String username;
 
     public PostLogin(ServerFacade facade){
         this.facade = facade;
@@ -90,6 +91,7 @@ public class PostLogin {
             ChessBoard board = new ChessBoard();
             board.resetBoard();
             DrawBoard.drawBoard(board, perspective);
+            username = params[1].toUpperCase();
             return "Joined game as " + params[1].toUpperCase() + ".";
         }
         throw new Exception("Please enter a game number and color.");
@@ -108,6 +110,10 @@ public class PostLogin {
             return "Observing game " + params[0];
         }
         throw new Exception("Please enter a game number.");
+    }
+
+    public String getName(){
+        return this.username;
     }
 
 }

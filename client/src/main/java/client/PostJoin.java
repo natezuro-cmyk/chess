@@ -26,6 +26,7 @@ public class PostJoin {
                 case "move" -> makeMove(params, authToken);
                 case "leave" -> leave(authToken);
                 case "resign" -> resign(authToken);
+                case "redraw" -> redraw(authToken);
                 default -> "Unknown command. Type 'help' to see available commands.";
             };
         } catch (Exception ex) {
@@ -39,6 +40,7 @@ public class PostJoin {
                 - move
                 - leave
                 - resign
+                - redraw
                 """;
     }
 
@@ -51,18 +53,25 @@ public class PostJoin {
 
 
     private String makeMove(String[] params, String authToken) throws Exception{
-        ChessPosition startPos = getPosition(params[1]);
-        ChessPosition endPos = getPosition(params[2]);
+        ChessPosition startPos = getPosition(params[0]);
+        ChessPosition endPos = getPosition(params[1]);
         ChessMove move = new ChessMove (startPos, endPos, null);
         facade.makeMove(move, authToken);
+        return "Making move.";
     }
 
     private String leave(String authToken) throws Exception {
         facade.leave(authToken);
+        return"Leaving game.";
     }
 
     private String resign(String authToken) throws Exception {
         facade.resign(authToken);
+        return "Resigning.";
+    }
 
+    private String redraw(String authToken) throws Exception {
+        facade.redraw(authToken);
+        return "Redrawing";
     }
 }
