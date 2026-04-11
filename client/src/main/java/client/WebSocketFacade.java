@@ -2,6 +2,7 @@ package client;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import com.google.gson.Gson;
 
@@ -121,11 +122,29 @@ public class WebSocketFacade extends Endpoint {
 
     public void highlight(ChessPosition pos) {
         if (gameData == null) { System.out.println("No game loaded."); return; }
+        if (gameData.game().getBoard().getPiece(pos) == null) {
+            System.out.println("No piece at that position.");
+            return;
+        }
         ChessGame game = gameData.game();
         java.util.Collection<ChessMove> validMoves = game.validMoves(pos);
         ChessGame.TeamColor perspective = (authData != null && authData.username().equals(gameData.blackUsername()))
                 ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
         DrawBoard.drawBoard(gameData.game().getBoard(), perspective, validMoves, pos);
+    }
+
+    public boolean isObserver() {
+        if (gameData == null || authData == null) { return true; }
+        return !authData.username().equals(gameData.whiteUsername()) &&
+               !authData.username().equals(gameData.blackUsername());
+    }
+
+    public boolean isPromotionMove(ChessPosition start, ChessPosition end) {
+        if (gameData == null) { return false; }
+        ChessPiece piece = gameData.game().getBoard().getPiece(start);
+        if (piece == null || piece.getPieceType() != ChessPiece.PieceType.PAWN) { return false; }
+        return (piece.getTeamColor() == ChessGame.TeamColor.WHITE && end.getRow() == 8) ||
+               (piece.getTeamColor() == ChessGame.TeamColor.BLACK && end.getRow() == 1);
     }
 
     public void connect(int gameID, String authToken) throws IOException {

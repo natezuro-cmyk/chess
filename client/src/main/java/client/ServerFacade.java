@@ -22,7 +22,12 @@ public class ServerFacade {
     }
 
     private void throwIfError(HttpURLConnection connection) throws Exception {
-        throwIfError(connection);
+        if (connection.getResponseCode() != 200) {
+            var errorStream = connection.getErrorStream();
+            var reader = new InputStreamReader(errorStream);
+            var error = new Gson().fromJson(reader, Map.class);
+            throw new Exception((String) error.get("message"));
+        }
     }
 
     public void clear()throws Exception{
